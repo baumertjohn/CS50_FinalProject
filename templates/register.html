@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Create A New Account</h1>
+        {% if error %}
+        <div>
+            <h2 style="color: red">Username already taken.</h2>
+        </div>
+        {% endif %}
+        <form action="/register" method="post" id="registrationForm" onsubmit="return validateForm()">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" type="text" id="username"
+                    name="username" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" type="password" id="password" name="password"
+                    placeholder="Password" required>
+            </div>
+            <div div class="mb-3">
+                <input class="form-control mx-auto w-auto" type="password" id="confirmPassword" name="confirmPassword"
+                    placeholder="Confirm Password" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Register</button>
+        </form>
+
+        <script>
+            function validateForm() {
+                var password = document.getElementById("password").value;
+                var confirmPassword = document.getElementById("confirmPassword").value;
+
+                if (password !== confirmPassword) {
+                    alert("Passwords do not match!");
+                    return false;
+                }
+                return true;
+            }
+        </script>
+    </div>
+{% endblock %}

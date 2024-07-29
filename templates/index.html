@@ -1,0 +1,47 @@
+{% set screen_width = 599 %}
+{% extends "base.html" %}
+
+{% block title %}
+Home Page
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Find a Brewery</h1>
+        <form action="/" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="brewery_search"
+                    name="brewery_search" placeholder="Brewery" type="text" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+        <h2 style="margin-top: 25px">Current Ratings</h2>
+        {% if breweries %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Brewery</th>
+                    <th scope="col" class="table-hide">City</th>
+                    <th scope="col" class="table-hide">State</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Last Visit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for brewery in breweries %}
+                <tr>
+                    <td>{{ brewery['brewery_name'] }}</td>
+                    <td class="table-hide">{{ brewery['city'] }}</td>
+                    <td class="table-hide">{{ brewery['state'] }}</td>
+                    <td>{{ brewery['rating'] }}</td>
+                    <td>{{ brewery['rating_date'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h3>Nothing yet</h3>
+        <h3>Rate a brewery to get started.</h3>
+        {% endif %}
+    </div>
+{% endblock %}

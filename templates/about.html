@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+About
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <section>
+            <h1>About</h1>
+            <h3>This is my CS50 Final Project utilizing:</h3>
+            <h4>Python<br>Flask / Jinja<br>SQL<br>HTML / CSS</h4>
+            <hr>
+        </section>
+
+        <section>
+            <h2>Brewery data provided by</h2>
+            <a href="https://www.openbrewerydb.org/" target="_blank">
+                <img src="{{ url_for('static', filename='images/obdb-logo.png') }}" alt="Open Brewery Database Logo"
+                    width="200" />
+            </a>
+            <h3>The Open Brewery Database</h3>
+        </section>
+    </div>
+{% endblock %}

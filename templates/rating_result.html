@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Overall Rating
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Overall Rating</h1>
+        <h2>for</h2>
+        <h1>{{ brewery['name'] }}</h1>
+        <hr>
+        <h1 style="padding: 20px; font-size: 4em">{{ rating }}</h1>
+        <form action="/rating_result" method="post">
+            <input type="hidden" id="rating" name="rating" value="{{ rating }}">
+            <input type="hidden" id="rating_date" name="rating_date" value="{{ rating_date }}">
+            <button type="submit" class="btn btn-log">Log It</button>
+        </form>
+        <h4 style="padding: 20px">OR</h4>
+        <input type="button" class="btn btn-rerate" value="Re-Rate" onclick="history.back()">
+    </div>
+{% endblock %}

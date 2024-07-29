@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+Rate the Brewery
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Rate the Brewery</h1>
+        <h1>{{ brewery['name'] }}</h1>
+        <hr>
+        <div class="row rating">
+            <div class="col">Poor</div>
+            <div class="col">Mediocre</div>
+            <div class="col">Average</div>
+            <div class="col">Good</div>
+            <div class="col">Great</div>
+        </div>
+        <br>
+        <form action="{{ url_for('rating', brewery_id=brewery_id) }}" method="post">
+            <label for="beer_quality" class="form-label">
+                <h5>Beer Quality</h5>
+            </label>
+            <input type="range" class="form-range" id="beer_quality" name="beer_quality">
+            <label for="atmosphere" class="form-label">
+                <h5>Atmosphere</h5>
+            </label>
+            <input type="range" class="form-range" id="atmosphere" name="atmosphere">
+            <label for="location" class="form-label">
+                <h5>Location</h5>
+            </label>
+            <input type="range" class="form-range" id="location" name="location">
+            <label for="rating_date" class="form-label">
+                <h5>Date of Visit</h5>
+            </label>
+            <div>
+                <input type="date" id="rating_date" name="rating_date" required>
+            </div>
+            <hr>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}
