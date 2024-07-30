@@ -1,9 +1,10 @@
 import math
 import requests
 
-from cs50 import SQL
+# from cs50 import SQL
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -18,8 +19,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///user_rating.db")
-
+# db = SQL("sqlite:///user_rating.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///user_rating.db"
+db = SQLAlchemy(app)
 
 def login_required(f):
     """
