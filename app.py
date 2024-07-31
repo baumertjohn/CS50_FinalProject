@@ -23,6 +23,7 @@ Session(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///user_rating.db"
 db = SQLAlchemy(app)
 
+
 def login_required(f):
     """
     Decorate routes to require login.
@@ -207,4 +208,3 @@ def search_results():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000", debug=True)
-
