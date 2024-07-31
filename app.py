@@ -55,11 +55,6 @@ class Rating(db.Model):
     user = db.relationship("User", backref=db.backref("ratings", lazy=True))
 
 
-# Check for database and create if needed
-if not os.path.exists("user_rating.db"):
-    db.create_all()
-
-
 def login_required(f):
     """
     Decorate routes to require login.
@@ -79,30 +74,23 @@ def login_required(f):
 @login_required
 def index():
     # Find current breweries and ratings
-    breweries_with_ratings = db.execute(
-        """
-        SELECT
-            b.id AS brewery_id,
-            b.name AS brewery_name,
-            b.city,
-            b.state,
-            r.rating,
-            r.rating_date
-        FROM
-            Brewery b
-        JOIN
-            Rating r ON b.id = r.brewery_id
-        JOIN
-            User u ON r.user_id = u.id
-        WHERE
-            u.id = ?
-        ORDER BY
-            r.rating_date DESC
-    """,
-        session["user_id"],
+    user_id = session["user_id"]
+    breweries_with_ratings = (
+        db.session.query(
+            Brewery.id.label("brewery_id"),
+            Brewery.name.label("brewery_name"),
+            Brewery.city,
+            Brewery.state,
+            Brewery.rating,
+            Brewery.rating_date,
+        )
+        .join(Rating, Brewery.id == Rating.brewery_id)
+        .join(User, Rating.user_id == User.id)
+        .filter(User.id == user_id)
+        .order_by(Rating.rating_date.desc())
+        .all()
     )
-    # for brewery in breweries_with_ratings:
-    #     print(brewery)
+
     if request.method == "POST":
         session["breweries"] = []
         brewery_search = request.form.get("brewery_search")
@@ -124,16 +112,15 @@ def login():
     session.clear()  # Forget any user_id
     if request.method == "POST":
         # Query database for username
-        rows = db.execute(
-            "SELECT * FROM User WHERE username = ?", request.form.get("username")
-        )
+        username = request.form.get("username")
+        user = User.query.filter_by(username=username).first()
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(
-            rows[0]["password_hash"], request.form.get("password")
+        if user is None or not check_password_hash(
+            user.password_hash, request.form.get("password")
         ):
             return render_template("login.html", error=True)
-        session["user_id"] = rows[0]["id"]  # Remember which user has logged in
-        session["user_name"] = rows[0]["username"]
+        session["user_id"] = user.id  # Remember which user has logged in
+        session["user_name"] = user.username
         session["breweries"] = []
         return redirect("/")  # Redirect user to home page
     return render_template("login.html", error=False)
@@ -217,17 +204,17 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         # check if user in database and add user to database
-        user = db.execute("SELECT * FROM User where username = ?", username)
-        if len(user) == 0:
+        user = User.query.filter_by(username=username).first()
+        if user is None:
+            # Hash the password
             password_hash = generate_password_hash(password)
-            db.execute(
-                "INSERT INTO User (username, password_hash) VALUES (?, ?)",
-                username,
-                password_hash,
-            )
+            # Create a new user and add to the database
+            new_user = User(username=username, password_hash=password_hash)
+            db.session.add(new_user)
+            db.session.commit()
             # find user id and login
-            user = db.execute("SELECT * FROM User where username = ?", username)
-            session["user_id"] = user[0]["id"]
+            user = User.query.filter_by(username=username).first()
+            session["user_id"] = user.id
             return redirect("/")
         else:
             return render_template("register.html", error=True)
@@ -243,4 +230,8 @@ def search_results():
 
 
 if __name__ == "__main__":
+    # Check for database and create if needed
+    if not os.path.exists("user_rating.db"):
+        with app.app_context():
+            db.create_all()
     app.run(host="0.0.0.0", port="5000", debug=True)
