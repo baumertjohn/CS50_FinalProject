@@ -1,5 +1,6 @@
 import math
 import requests
+import os
 
 # from cs50 import SQL
 from flask import Flask, redirect, render_template, request, session
@@ -21,7 +22,42 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 # db = SQL("sqlite:///user_rating.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///user_rating.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+
+# Database table setup
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.Text, unique=True, nullable=False)
+    password_hash = db.Column(db.Text, nullable=False)
+
+
+class Brewery(db.Model):
+    __tablename__ = "breweries"
+    id = db.Column(db.Integer, primary_key=True)
+    api_id = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    city = db.Column(db.Text, nullable=False)
+    state = db.Column(db.Text, nullable=False)
+
+
+class Rating(db.Model):
+    __tablename__ = "ratings"
+    id = db.Column(db.Integer, primary_key=True)
+    brewery_id = db.Column(db.Integer, db.ForeignKey("breweries.id"), nullable=False)
+    rating = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    rating_date = db.Column(db.Date, nullable=False)
+
+    brewery = db.relationship("Brewery", backref=db.backref("ratings", lazy=True))
+    user = db.relationship("User", backref=db.backref("ratings", lazy=True))
+
+
+# Check for database and create if needed
+if not os.path.exists("user_rating.db"):
+    db.create_all()
 
 
 def login_required(f):
