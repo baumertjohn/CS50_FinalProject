@@ -1,3 +1,4 @@
+import datetime
 import math
 import requests
 import os
@@ -81,8 +82,8 @@ def index():
             Brewery.name.label("brewery_name"),
             Brewery.city,
             Brewery.state,
-            Brewery.rating,
-            Brewery.rating_date,
+            Rating.rating,
+            Rating.rating_date,
         )
         .join(Rating, Brewery.id == Rating.brewery_id)
         .join(User, Rating.user_id == User.id)
@@ -170,30 +171,29 @@ def rating(brewery_id):
 def rating_result():
     if request.method == "POST":
         rating = request.form.get("rating")
-        rating_date = request.form.get("rating_date")
-        # print(session["brewery"]["name"], rating)
+        rating_date_str = request.form.get("rating_date")
+        # Convert the date string to a date object
+        rating_date = datetime.datetime.strptime(rating_date_str, "%Y-%m-%d").date()
         # Time to add all this to the database...
         # Check if brewery is in database and add brewery
         b = session["brewery"]  # For brevity
-        check = db.execute("SELECT * FROM Brewery where api_id = ?", b["id"])
-        if len(check) == 0:
-            db.execute(
-                "INSERT INTO Brewery (api_id, name, city, state) VALUES (?, ?, ?, ?)",
-                b["id"],
-                b["name"],
-                b["city"],
-                b["state"],
+        brewery = Brewery.query.filter_by(api_id=b["id"]).first()
+        if brewery is None:
+            # Create new brewery record
+            brewery = Brewery(
+                api_id=b["id"], name=b["name"], city=b["city"], state=b["state"]
             )
-        # Get new or existing id of brewery
-        brewery_db_id = db.execute("SELECT * FROM Brewery where api_id = ?", b["id"])
+            db.session.add(brewery)
+            db.session.commit()
         # Update Rating table
-        db.execute(
-            "INSERT INTO Rating (brewery_id, rating, user_id, rating_date) VALUES (?, ?, ?, ?)",
-            brewery_db_id[0]["id"],
-            rating,
-            session["user_id"],
-            rating_date,
+        new_rating = Rating(
+            brewery_id=brewery.id,
+            rating=rating,
+            user_id=session["user_id"],
+            rating_date=rating_date,
         )
+        db.session.add(new_rating)
+        db.session.commit()
         return redirect("/")
     return render_template("rating_result.html")
 
@@ -215,6 +215,7 @@ def register():
             # find user id and login
             user = User.query.filter_by(username=username).first()
             session["user_id"] = user.id
+            session["user_name"] = user.username
             return redirect("/")
         else:
             return render_template("register.html", error=True)
@@ -229,9 +230,7 @@ def search_results():
     return redirect("/")
 
 
-if __name__ == "__main__":
-    # Check for database and create if needed
+# Check for database and create if needed
+with app.app_context():
     if not os.path.exists("user_rating.db"):
-        with app.app_context():
-            db.create_all()
-    app.run(host="0.0.0.0", port="5000", debug=True)
+        db.create_all()

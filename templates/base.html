@@ -37,7 +37,7 @@
               </ul>
               <div class="d-flex navbar-brand">
                 {% if session["user_id"] %}
-                <div style="margin: 2px 20px 0 0">Hello, {{ session["user_name"] }}</div>
+                <div style="margin: 2px 20px 0 0">Hello, {{ session.get("user_name") }}</div>
                 <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-secondary">Log Out</a>
                 {% else %}
                 <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-secondary">Log In / Register</a>
