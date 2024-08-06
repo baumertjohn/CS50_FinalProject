@@ -1,6 +1,6 @@
 # CS50 Final Project - BREW LOG
 
-#### Video Demo: <https://youtu.be/b1xrZoBFZLg>
+#### Live Demo: <https://brewlog.baumert.tech/>
 
 #### Description
 
@@ -18,13 +18,13 @@ functions require the user to be logged in utilizing a "login_required"
 decorator as the app itself is intended to be a user log and not just a general
 search. The "templates" folder is typical of a flask project where the
 "base.html" file contains the header and footer code for all the pages and is
-added using jinja to the various other pages.
+added using Jinja to the various other pages.
 
 For data storage, I chose to use an SQL relational database with three tables -
-User, Brewery, Rating.  This allowed me to store username and passwords
-separate of a list of searched breweries. The brewery list is checked when
-adding a rank and existing breweries are linked to it to reduce API calls.  I
-feel this also makes the website perform faster with local data.
+User, Brewery, Rating.  This allowed me to store usernames and passwords
+separately from a searched breweries. The brewery list is checked when
+adding a rank and existing breweries are linked to it to reduce API calls.  
+This also makes the website perform faster with local data.
 
 ## Features
 
@@ -56,17 +56,17 @@ flask run
 
 ## Usage
 
-Starting at the home page the user is asked to login or register an account.
+Starting at the home page the user is asked to log in or register an account.
 Once an account is created, the user is then able to search for a brewery and
 rate a brewery on beer quality, atmosphere, and location. Afterward, the user
 is shown the overall score and given a chance to re-rate or log the entry.
 
 ## Roadmap
 
-- Move away from CS50 library to SQLAlchemy, etc.
+- DONE: ~~Move away from CS50 library to SQLAlchemy, etc.~~
+- DONE: ~~Move to server for hosting to "the world"...~~
 - Enable the user to delete or edit a vote
 - Institute a "user's choice" for highest rated brewery
-- Move to server for hosting to "the world"...
 
 ## Acknowledgements
 
